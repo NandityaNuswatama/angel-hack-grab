@@ -12,6 +12,8 @@ data class MerchantDataModel(
     var products: List<Product> = emptyList(),
     var deliveryTime: String = "",
     var deliveryPrice: String = "",
+    var name: String = "",
+    var address: String = "",
 ) : Parcelable
 
 @Parcelize
