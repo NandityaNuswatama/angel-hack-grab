@@ -1,8 +1,11 @@
 package com.nandits.angelhackgrab.screen.delivery
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.ScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,14 +14,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -26,20 +33,21 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,43 +55,103 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.nandits.angelhackgrab.R
 import com.nandits.angelhackgrab.datamodel.DriverDataModel
+import com.nandits.angelhackgrab.datamodel.OrderDataModel
 import com.nandits.angelhackgrab.datamodel.Tip
+import com.nandits.angelhackgrab.datamodel.constant.getTips
 import com.nandits.angelhackgrab.screen.common.GrabImage
 import com.nandits.angelhackgrab.screen.common.GrabRoundImage
+import com.nandits.angelhackgrab.screen.common.ZoomableImage
 import com.nandits.angelhackgrab.ui.theme.AngelHackGrabTheme
 import com.nandits.angelhackgrab.ui.theme.GrabOnSecondary
 import com.nandits.angelhackgrab.ui.theme.GrabPrimary
 import com.nandits.angelhackgrab.ui.theme.GrabPrimaryVariant
 import com.nandits.angelhackgrab.ui.theme.GrabPrimaryVariant10
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveryLayout(
     modifier: Modifier = Modifier,
+    orderDataModel: OrderDataModel,
+    driverDataModel: DriverDataModel,
+    onStoryClicked: (String) -> Unit,
 ) {
-    Scaffold {
+    val sheetState = rememberBottomSheetScaffoldState()
+    val coroutineScope = rememberCoroutineScope()
 
-        ModalBottomSheet(onDismissRequest = {
-
-        }) {
-            DeliveryTray()
+    // Handle back press
+    BackHandler(enabled = sheetState.bottomSheetState.hasExpandedState) {
+        coroutineScope.launch {
+            sheetState.bottomSheetState.expand()
         }
     }
-    Box(modifier = Modifier.fillMaxSize()) {
-        GrabImage(imageURL = R.drawable.il_grab_maps, modifier = Modifier.fillMaxSize())
+
+    BottomSheetScaffold(
+        scaffoldState = sheetState,
+        sheetContent = {
+            DeliveryTray(
+                Modifier,
+                orderDataModel,
+                driverDataModel,
+                onStoryClicked
+            ) {
+
+            }
+        },
+        sheetPeekHeight = 100.dp,
+        containerColor = Color.White,
+        sheetDragHandle = null,
+        sheetContainerColor = Color.Transparent
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            ZoomableImage(modifier = Modifier.fillMaxWidth(), imageURL = R.drawable.grab_maps)
+        }
     }
 }
 
 @Composable
 fun DeliveryTray(
     modifier: Modifier = Modifier,
+    orderDataModel: OrderDataModel,
+    driverDataModel: DriverDataModel,onStoryClicked: (String) -> Unit,
+    onCompleteOrderClicked: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .background(Color.Transparent)
             .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .verticalScroll(scrollState), // Add vertical scroll
+        verticalArrangement = Arrangement.spacedBy(4.dp) // Add spacing between items
     ) {
+        CardDriverState(arrivalTime = orderDataModel.arriveTime)
 
+        CardDriverStory(name = driverDataModel.name, story = driverDataModel.story) {
+            onStoryClicked(driverDataModel.story)
+        }
+
+        CardDriverGenerateSticker {
+
+        }
+
+        CardDriverTip()
+
+        Button(
+            onClick = { onCompleteOrderClicked() },
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(4.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = GrabPrimary
+            )
+        ) {
+            Text(text = "Order Selesai")
+        }
     }
 }
 
@@ -112,7 +180,7 @@ fun CardDriverState(arrivalTime: String) {
 
 @Composable
 fun CardDriverIdentity(driverDataModel: DriverDataModel) {
-    Card(shape = RoundedCornerShape(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White), modifier = Modifier.height(132.dp)) {
+    Card(shape = RoundedCornerShape(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White), modifier = Modifier.height(132.dp).background(Color.White)) {
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
@@ -246,7 +314,7 @@ fun CardDriverGenerateSticker(onGenerateClicked: (String) -> Unit) {
 }
 
 @Composable
-fun CardDriverTip(availableTips: List<Tip>) {
+fun CardDriverTip(availableTips: List<Tip> = getTips()) {
 
     val keyboardController = LocalSoftwareKeyboardController.current
     var selectedTip by remember { mutableStateOf<String?>(null) }
@@ -264,7 +332,7 @@ fun CardDriverTip(availableTips: List<Tip>) {
 
             Spacer(modifier = Modifier.size(12.dp))
 
-            LazyColumn(Modifier.fillMaxWidth()) {
+            LazyColumn(Modifier.fillMaxWidth().heightIn(max = 300.dp)) {
                 items(availableTips.chunked(2)) { row ->
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
@@ -334,17 +402,19 @@ private fun TipItem(modifier: Modifier, tip: Tip, isSelected: Boolean, onClick: 
 
 @Preview(showBackground = true)
 @Composable
-fun CardDriverPreview() {
+fun OrderPreview() {
     AngelHackGrabTheme {
-        CardDriverTip(
-            listOf(
-                Tip("2000", true),
-                Tip("5000", false),
-                Tip("7000", false),
-                Tip("10000", false),
-                Tip("20000", false),
-                Tip("50000", false),
-            )
+        DeliveryLayout(
+            orderDataModel = OrderDataModel(arriveTime = "10:00 AM"),
+            driverDataModel = DriverDataModel(
+                name = "John Doe",
+                photoUrl = "https://gallery.poskota.co.id/storage/Foto/aloy-ojol.jpg",
+                rating = 4.9,
+                vehicle = "Verio 180",
+                vehicleNumber = "B 5123 UYT",
+                story = "Berani dan Pantang Menyerah merupakan hal yang menggambarkan muhadjirin sebagai sosok driver dengan baju terapi, dimana dia berani menerjang hujan bada mengantarkan penumpang. Hal ini sudah dilakukannya 20 kali"
+            ),
+            onStoryClicked = {}
         )
     }
 }
