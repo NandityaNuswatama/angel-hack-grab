@@ -5,23 +5,23 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class MerchantDataModel(
-    var merchantId: String = "",
+    var merchantId: Int = 0,
     var bannerImageUrl: String = "",
     var merchantImageUrl: String = "",
-    var highlightedProducts: List<Product> = emptyList(),
-    var products: List<Product> = emptyList(),
+    var productDataModels: List<ProductDataModel> = emptyList(),
     var deliveryTime: String = "",
     var deliveryPrice: String = "",
     var name: String = "",
     var address: String = "",
+    var rating: String = ""
 ) : Parcelable
 
 @Parcelize
-data class Product(
-    var productId: String = "",
+data class ProductDataModel(
+    var productId: Int = 0,
     var productImageUrl: String = "",
     var name: String = "",
-    var description: String = "",
     var price: String = "",
     var originalPrice: String = "",
+    var numberPrice: Int = 0
 ) : Parcelable

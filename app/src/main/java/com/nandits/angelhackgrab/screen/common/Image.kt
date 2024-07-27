@@ -34,17 +34,28 @@ fun GrabImage(
     contentDescription: String? = null,
     contentScale: ContentScale = ContentScale.Crop
 ) {
-    val painter = rememberAsyncImagePainter(
-        model = imageURL
-    )
-    Box {
+    if (imageURL is Int) {
+        val painter = painterResource(id = imageURL)
         Image(
             painter = painter,
             contentDescription = contentDescription,
             contentScale = contentScale,
-            modifier = modifier,
+            modifier = modifier
         )
-        if (painter.state is AsyncImagePainter.State.Loading) CircularProgressIndicator(Modifier.align(Alignment.Center))
+    } else {
+        val painter = rememberAsyncImagePainter(
+            model = imageURL
+        )
+        Box {
+            Image(
+                painter = painter,contentDescription = contentDescription,
+                contentScale = contentScale,
+                modifier = modifier
+            )
+            if (painter.state is AsyncImagePainter.State.Loading) {
+                CircularProgressIndicator(Modifier.align(Alignment.Center))
+            }
+        }
     }
 }
 

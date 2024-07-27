@@ -65,6 +65,7 @@ dependencies {
     //Json
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.hilt.android)
+    implementation(libs.androidx.hilt.navigation.compose)
     kapt(libs.hilt.compiler)
     //ViewModels
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -77,6 +78,7 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.okhttp.logging)
     implementation(libs.okhttp)
+    implementation(libs.retrofit.coroutines.adapter)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
