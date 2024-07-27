@@ -11,4 +11,5 @@ data class DriverDataModel(
     var vehicle: String = "",
     var vehicleNumber: String = "",
     var story: String = "",
+    var photoUrl: String = ""
 ): Parcelable

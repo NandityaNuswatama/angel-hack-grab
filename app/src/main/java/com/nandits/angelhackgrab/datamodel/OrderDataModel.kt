@@ -18,10 +18,12 @@ data class OrderDataModel(
 
 @Parcelize
 data class Tip (
-    var amount: Int = 0
+    var amount: String = "",
+    var isSelected: Boolean = false
 ): Parcelable
 
 @Parcelize
 data class QuickRating (
-    var text: String = ""
+    var text: String = "",
+    var isSelected: Boolean = false
 ): Parcelable
