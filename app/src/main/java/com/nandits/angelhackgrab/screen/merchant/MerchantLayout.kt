@@ -106,7 +106,7 @@ fun MerchantLayout(
                 }
             }
 
-            Spacer(Modifier.width(14.dp))
+            Spacer(Modifier.height(14.dp))
 
             Column(
                 modifier = Modifier

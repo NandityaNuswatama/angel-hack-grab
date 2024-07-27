@@ -11,5 +11,6 @@ data class Order(
     val earned_point: Int,
     val item_count: Int,
     val merchant_id: Int,
-    val driver_id: Int
+    val driver_id: Int,
+    val arrival_time: Int
 )

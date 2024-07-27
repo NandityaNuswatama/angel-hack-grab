@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DriverDataModel(
-    var driverId: String = "",
+    var driverId: Int = 0,
     var name: String = "",
     var rating: Double = 5.0,
     var vehicle: String = "",

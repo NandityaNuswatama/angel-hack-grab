@@ -18,23 +18,39 @@ import com.nandits.angelhackgrab.screen.OrderViewModel
 @Composable
 fun MerchantScreen(navController: NavController, viewModel: OrderViewModel = hiltViewModel()) {
     val merchant by viewModel.merchant.collectAsState()
+    val orderCreated by viewModel.orderCreated.collectAsState()
     var orderDataModel by remember { mutableStateOf(OrderDataModel()) }
+    var totalPrice by remember { mutableStateOf(0) }
+    var originalPrice by remember { mutableStateOf(0) }
+    var isOnDisplay by remember { mutableStateOf(true) }
+    var isBlank by remember { mutableStateOf(true) }
 
     LaunchedEffect(key1 = Unit) {
         viewModel.getMerchant((1..3).random())
     }
 
     merchant?.let { merchantModel ->
+        if (isBlank) {
+            totalPrice = addTwoRandomItemsByIndex(merchantModel.productDataModels.map { it.numberPrice })
+            originalPrice = addTwoRandomItemsByIndex(merchantModel.productDataModels.map { it.numberOriginalPrice })
+            isBlank = false
+        }
         orderDataModel =
-            OrderDataModel(itemsCount = 2, totalPrice = formatNumber(addTwoRandomItemsByIndex(merchantModel.productDataModels.map { it.numberPrice })))
+            OrderDataModel(itemsCount = 2, totalPrice = formatNumber(totalPrice))
         MerchantLayout(
             merchantDataModel = merchantModel,
             orderDataModel = orderDataModel,
-            onBackClicked = {
-
-            },
+            onBackClicked = {},
             onOrderClicked = {
-//                navController.
+                viewModel.createOrder(totalPrice, originalPrice, merchantModel.merchantId)
             })
+    }
+
+    if (isOnDisplay) {
+        orderCreated?.let {
+            navController.popBackStack()
+            navController.navigate("delivery/${it.first}/${it.second}")
+            isOnDisplay = false
+        }
     }
 }

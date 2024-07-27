@@ -1,8 +1,12 @@
 package com.nandits.angelhackgrab.data.bridge
 
+import com.nandits.angelhackgrab.data.response.DriverResponse
 import com.nandits.angelhackgrab.data.response.Merchant
+import com.nandits.angelhackgrab.data.response.Order
 import com.nandits.angelhackgrab.data.response.Product
+import com.nandits.angelhackgrab.datamodel.DriverDataModel
 import com.nandits.angelhackgrab.datamodel.MerchantDataModel
+import com.nandits.angelhackgrab.datamodel.OrderDataModel
 import com.nandits.angelhackgrab.datamodel.ProductDataModel
 import java.text.DecimalFormat
 import java.time.LocalDateTime
@@ -29,7 +33,32 @@ fun convertProductToDataModel(product: Product): ProductDataModel {
         name = product.name,
         price = formatNumber(product.price),
         originalPrice = formatNumber(product.original_price),
-        numberPrice = product.price
+        numberPrice = product.price,
+        numberOriginalPrice = product.original_price
+    )
+}
+
+fun convertOrderToDataModel(order: Order): OrderDataModel {
+    return OrderDataModel(
+        arriveTime = addMinutesToCurrentTime(order.arrival_time),
+        totalPrice = formatNumber(order.total_price),
+        originalPrice = formatNumber(order.original_price),
+        itemsCount = 2,
+        pointsEarned = formatNumber(order.earned_point),
+        merchantId = order.merchant_id
+    )
+}
+
+fun convertDriverToDataModel(driver: DriverResponse): DriverDataModel {
+    return DriverDataModel(
+        driverId = driver.id,
+        name = driver.name,
+        rating = driver.rating,
+        vehicle = driver.vehicle,
+        vehicleNumber = driver.vehicle_number,
+        story = driver.story,
+        photoUrl = driver.image_url
+
     )
 }
 

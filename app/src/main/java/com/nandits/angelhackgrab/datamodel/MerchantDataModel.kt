@@ -23,5 +23,6 @@ data class ProductDataModel(
     var name: String = "",
     var price: String = "",
     var originalPrice: String = "",
-    var numberPrice: Int = 0
+    var numberPrice: Int = 0,
+    var numberOriginalPrice: Int = 0,
 ) : Parcelable

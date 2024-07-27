@@ -16,7 +16,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.nandits.angelhackgrab.screen.delivery.DeliveryScreen
 import com.nandits.angelhackgrab.screen.merchant.MerchantScreen
+import com.nandits.angelhackgrab.screen.rating.RatingScreen
 import com.nandits.angelhackgrab.ui.theme.AngelHackGrabTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -42,5 +44,35 @@ fun AppNavigation() {
         navController = navController, startDestination = "main"
     ) {
         composable("main") { (MerchantScreen(navController)) }
+        composable(
+            "delivery/{orderId}/{driverId}",
+            arguments = listOf(
+                navArgument("orderId") { type = NavType.IntType },
+                navArgument("driverId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            DeliveryScreen(
+                backStackEntry.arguments?.getInt("orderId") ?: 0,
+                backStackEntry.arguments?.getInt("driverId") ?: 0,
+                navController
+            )
+        }
+        composable(
+            "rating/{driverPhotoUrl}/{driverId}/{stickerUrl}/{totalPrice}",
+            arguments = listOf(
+                navArgument("driverPhotoUrl") { type = NavType.StringType },
+                navArgument("driverId") { type = NavType.IntType },
+                navArgument("stickerUrl") { type = NavType.StringType },
+                navArgument("totalPrice") { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            RatingScreen(
+                backStackEntry.arguments?.getString("driverPhotoUrl") ?: "",
+                backStackEntry.arguments?.getInt("driverId") ?: 0,
+                backStackEntry.arguments?.getString("stickerUrl") ?: "",
+                backStackEntry.arguments?.getString("totalPrice") ?: "",
+                navController
+            )
+        }
     }
 }

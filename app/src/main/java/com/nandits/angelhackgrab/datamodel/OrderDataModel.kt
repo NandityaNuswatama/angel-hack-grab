@@ -6,24 +6,23 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class OrderDataModel(
     var arriveTime: String = "",
-    var merchantName: String = "",
     var totalPrice: String = "",
     var originalPrice: String = "",
     var itemsCount: Int = 0,
-    var driver: DriverDataModel = DriverDataModel(),
     var tips: List<Tip> = emptyList(),
     var pointsEarned: String = "",
     var quickRatings: List<QuickRating> = emptyList(),
-) :Parcelable
+    var merchantId: Int = 0,
+) : Parcelable
 
 @Parcelize
-data class Tip (
+data class Tip(
     var amount: String = "",
     var isSelected: Boolean = false
-): Parcelable
+) : Parcelable
 
 @Parcelize
-data class QuickRating (
+data class QuickRating(
     var text: String = "",
     var isSelected: Boolean = false
-): Parcelable
+) : Parcelable

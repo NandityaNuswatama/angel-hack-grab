@@ -1,5 +1,6 @@
 package com.nandits.angelhackgrab.screen.delivery
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -24,6 +25,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -48,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -72,17 +75,17 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveryLayout(
-    modifier: Modifier = Modifier,
+    sheetState: BottomSheetScaffoldState = rememberBottomSheetScaffoldState(),
     orderDataModel: OrderDataModel,
     driverDataModel: DriverDataModel,
     stickerDataModel: StickerDataModel,
     onCompleteOrderClicked: () -> Unit,
+    onGenerateSticker: (String) -> Unit,
 ) {
-    val sheetState = rememberBottomSheetScaffoldState()
     val coroutineScope = rememberCoroutineScope()
     var showBottomSheetDriverStory by remember { mutableStateOf(false) }
-    var showBottomSheetDetailSticker by remember { mutableStateOf(false) }
-    var currentSticker by remember { mutableStateOf(stickerDataModel) }
+    var showBottomSheetDetailSticker by remember { mutableStateOf(stickerDataModel.imageUrl.isNotEmpty()) }
+    var lastPrompt by remember { mutableStateOf("") }
 
     BackHandler(enabled = sheetState.bottomSheetState.hasExpandedState) {
         coroutineScope.launch {
@@ -97,15 +100,16 @@ fun DeliveryLayout(
                 Modifier,
                 orderDataModel,
                 driverDataModel,
+                stickerDataModel,
                 onStoryClicked = {
                     showBottomSheetDriverStory = true
                 },
                 onCompleteOrderClicked = {
-
+                    onCompleteOrderClicked()
                 },
                 onGenerateSticker = {
-                    currentSticker = StickerDataModel(it, currentSticker.imageUrl)
-                    showBottomSheetDetailSticker = true
+                    lastPrompt = ""
+                    onGenerateSticker(it)
                 }
             )
 
@@ -157,6 +161,7 @@ fun DeliveryTray(
     modifier: Modifier = Modifier,
     orderDataModel: OrderDataModel,
     driverDataModel: DriverDataModel,
+    stickerDataModel: StickerDataModel,
     onStoryClicked: (DriverDataModel) -> Unit,
     onCompleteOrderClicked: () -> Unit,
     onGenerateSticker: (String) -> Unit,
@@ -168,18 +173,20 @@ fun DeliveryTray(
             .background(Color.Transparent)
             .padding(horizontal = 8.dp)
             .fillMaxWidth()
-            .verticalScroll(scrollState), // Add vertical scroll
-        verticalArrangement = Arrangement.spacedBy(4.dp) // Add spacing between items
+            .verticalScroll(scrollState),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         CardDriverState(arrivalTime = orderDataModel.arriveTime)
 
         CardDriverIdentity(driverDataModel = driverDataModel)
 
-        CardDriverStory(name = driverDataModel.name, story = driverDataModel.story) {
-            onStoryClicked(driverDataModel)
+        if (driverDataModel.story.contains("too low", true).not()) {
+            CardDriverStory(name = driverDataModel.name, story = driverDataModel.story) {
+                onStoryClicked(driverDataModel)
+            }
         }
 
-        CardDriverGenerateSticker {
+        CardDriverGenerateSticker(stickerDataModel) {
             onGenerateSticker(it)
         }
 
@@ -243,7 +250,7 @@ fun CardDriverIdentity(driverDataModel: DriverDataModel) {
                     ) {
                         Row {
                             Text(text = driverDataModel.name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(end = 4.dp))
-                            Text(text = driverDataModel.rating.toString(), style = MaterialTheme.typography.titleMedium)
+                            Text(text = driverDataModel.rating.toString(), style = MaterialTheme.typography.bodyMedium)
                             Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = Color(0xFFF8D368))
                         }
 
@@ -308,7 +315,7 @@ fun CardDriverStory(name: String, story: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun CardDriverGenerateSticker(onGenerateClicked: (String) -> Unit) {
+fun CardDriverGenerateSticker(stickerDataModel: StickerDataModel = StickerDataModel(), onGenerateClicked: (String) -> Unit) {
     Card(
         shape = RoundedCornerShape(8.dp), modifier = Modifier.height(240.dp)
     ) {
@@ -317,10 +324,11 @@ fun CardDriverGenerateSticker(onGenerateClicked: (String) -> Unit) {
             var input by remember { mutableStateOf("") }
 
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomStart) {
+                val imageSize = if (stickerDataModel.imageUrl.isEmpty()) 120.dp else 160.dp
                 GrabImage(
-                    imageURL = R.drawable.il_grab_meme_decor, modifier = Modifier
+                    imageURL = stickerDataModel.imageUrl.ifEmpty { R.drawable.il_grab_meme_decor }, modifier = Modifier
                         .width(166.dp)
-                        .height(120.dp)
+                        .height(imageSize)
                         .align(Alignment.BottomStart)
                 )
 
@@ -525,7 +533,7 @@ fun DetailStickerBottomSheet(stickerDataModel: StickerDataModel, onRegenerateCli
                 modifier = Modifier.padding(end = 4.dp, start = 16.dp, bottom = 12.dp)
             )
 
-            GrabImage(imageURL = stickerDataModel.imageUrl, modifier = Modifier.size(width = 180.dp, height = 140.dp))
+            GrabImage(imageURL = stickerDataModel.imageUrl, modifier = Modifier.size(width = 180.dp, height = 140.dp), contentScale = ContentScale.Fit)
 
             Spacer(modifier = Modifier.padding(4.dp))
 
@@ -553,6 +561,7 @@ fun DetailStickerBottomSheet(stickerDataModel: StickerDataModel, onRegenerateCli
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 fun OrderPreview() {
@@ -569,6 +578,9 @@ fun OrderPreview() {
             ),
             stickerDataModel = StickerDataModel("", "https://gallery.poskota.co.id/storage/Foto/aloy-ojol.jpg"),
             onCompleteOrderClicked = {
+
+            },
+            onGenerateSticker = {
 
             }
         )

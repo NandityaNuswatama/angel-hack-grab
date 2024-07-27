@@ -35,6 +35,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,9 +64,9 @@ import com.nandits.angelhackgrab.ui.theme.GrabPrimaryVariant15
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatingScreen(driverDataModel: DriverDataModel, orderDataModel: OrderDataModel, initialStickerDataModel: StickerDataModel) {
-    var initialRating by remember { mutableStateOf(0) }
-    var lastRating by remember { mutableStateOf(0) }
+fun RatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataModel, initialStickerDataModel: StickerDataModel) {
+    var initialRating by remember { mutableIntStateOf(0) }
+    var lastRating by remember { mutableIntStateOf(0) }
     var showBottomSheetDetailSticker by remember { mutableStateOf(false) }
     var stickerDataModel by remember { mutableStateOf(initialStickerDataModel) }
 
@@ -86,9 +87,7 @@ fun RatingScreen(driverDataModel: DriverDataModel, orderDataModel: OrderDataMode
                 initialRating = it
             }
         } else {
-            RatingLayout(
-                driverDataModel,
-                orderDataModel,
+            RatingSection(
                 initialRating,
                 onSelectRating = { lastRating = it },
                 onGenerateSticker = { showBottomSheetDetailSticker = true },
@@ -167,9 +166,7 @@ fun PreRatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataM
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun RatingLayout(
-    driverDataModel: DriverDataModel,
-    orderDataModel: OrderDataModel,
+fun RatingSection(
     initialRating: Int,
     onSelectRating: (Int) -> Unit,
     onGenerateSticker: (String) -> Unit,
@@ -302,7 +299,7 @@ fun RatingBar(
 @Composable
 fun RatingPreview() {
     AngelHackGrabTheme {
-        RatingScreen(
+        RatingLayout(
             orderDataModel = OrderDataModel(totalPrice = "42.000"),
             driverDataModel = DriverDataModel(
                 name = "John Doe",
