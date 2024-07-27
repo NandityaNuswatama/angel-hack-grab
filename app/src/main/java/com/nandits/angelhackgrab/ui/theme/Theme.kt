@@ -15,7 +15,8 @@ private val LightColorPalette = lightColorScheme(
     onSecondary = GrabOnSecondary,
     onBackground = GrabOnBackground,
     onSurface = GrabOnSurface,
-    onError = GrabOnError
+    onError = GrabOnError,
+    surfaceVariant = GrabSurface
 )
 
 
