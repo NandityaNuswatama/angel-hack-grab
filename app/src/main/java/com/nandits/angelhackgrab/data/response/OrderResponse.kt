@@ -1,7 +1,7 @@
 package com.nandits.angelhackgrab.data.response
 
 data class OrderResponse(
-    val orders: List<Order>
+    val order: Order
 )
 
 data class Order(

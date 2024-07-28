@@ -8,52 +8,50 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.nandits.angelhackgrab.datamodel.DriverDataModel
 import com.nandits.angelhackgrab.datamodel.StickerDataModel
 import com.nandits.angelhackgrab.screen.OrderViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DeliveryScreen(
-    orderId: Int,
     driverId: Int,
     navController: NavController,
     viewModel: OrderViewModel = hiltViewModel()
 ) {
     val sheetState = rememberBottomSheetScaffoldState()
     val driver by viewModel.driver.collectAsState()
-    val order by viewModel.order.collectAsState()
     val sticker by viewModel.sticker.collectAsState()
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getOrder(orderId)
         viewModel.getDriver(driverId)
     }
 
-    order?.let { orderDataModel ->
-        driver?.let { driverDataModel ->
-            DeliveryLayout(
-                sheetState,
-                orderDataModel = orderDataModel,
-                driverDataModel = driverDataModel,
-                stickerDataModel = StickerDataModel(),
-                onCompleteOrderClicked = {
-
-                },
-                onGenerateSticker = {
-                    viewModel.generateSticker(it)
-                },
-            )
-        }
+    driver?.let {
+        DeliveryLayout(
+            sheetState,
+            orderDataModel = viewModel.getLocalOrder(),
+            driverDataModel = it,
+            stickerDataModel = sticker ?: StickerDataModel(),
+            onCompleteOrderClicked = {
+                viewModel.savaToLocal()
+                navController.navigate("rating")
+            },
+            onGenerateSticker = {
+                viewModel.generateSticker(it)
+            },
+        )
     }
 
     sticker?.let {
         DeliveryLayout(
             sheetState,
-            orderDataModel = order!!,
-            driverDataModel = driver!!,
+            orderDataModel = viewModel.getLocalOrder(),
+            driverDataModel = driver ?: DriverDataModel(),
             stickerDataModel = it,
             onCompleteOrderClicked = {
-
+                viewModel.savaToLocal()
+                navController.navigate("rating")
             },
             onGenerateSticker = { prompt ->
                 viewModel.generateSticker(prompt)

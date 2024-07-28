@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -65,11 +66,12 @@ fun MerchantLayout(
             Spacer(Modifier.height(48.dp))
 
             Card(
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(12.dp),
             ) {
                 Column(modifier = Modifier
                     .background(Color.White)
-                    .padding(16.dp)) {
+                    .padding(16.dp)
+                ) {
                     Row(Modifier.padding(12.dp)) {
                         GrabImage(imageURL = merchantDataModel.merchantImageUrl, modifier = Modifier.size(100.dp))
 
@@ -172,7 +174,7 @@ fun ProductItem(productDataModel: ProductDataModel) {
 
             Spacer(Modifier.height(12.dp))
 
-            Column(Modifier) {
+            Column(Modifier.widthIn(150.dp)) {
                 Text(text = productDataModel.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Rp. ${productDataModel.price}", style = MaterialTheme.typography.titleSmall)
                 Text(text = "Rp. ${productDataModel.originalPrice}", style = MaterialTheme.typography.titleSmall, textDecoration = TextDecoration.LineThrough)

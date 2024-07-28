@@ -45,10 +45,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nandits.angelhackgrab.datamodel.DriverDataModel
+import com.nandits.angelhackgrab.datamodel.MerchantDataModel
 import com.nandits.angelhackgrab.datamodel.OrderDataModel
 import com.nandits.angelhackgrab.datamodel.StickerDataModel
 import com.nandits.angelhackgrab.datamodel.constant.getQuickRatings
@@ -56,7 +56,6 @@ import com.nandits.angelhackgrab.datamodel.constant.getRatings
 import com.nandits.angelhackgrab.screen.common.GrabRoundImage
 import com.nandits.angelhackgrab.screen.delivery.CardDriverGenerateSticker
 import com.nandits.angelhackgrab.screen.delivery.DetailStickerBottomSheet
-import com.nandits.angelhackgrab.ui.theme.AngelHackGrabTheme
 import com.nandits.angelhackgrab.ui.theme.GrabOnSecondary
 import com.nandits.angelhackgrab.ui.theme.GrabPrimary
 import com.nandits.angelhackgrab.ui.theme.GrabPrimaryVariant
@@ -64,7 +63,13 @@ import com.nandits.angelhackgrab.ui.theme.GrabPrimaryVariant15
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataModel, initialStickerDataModel: StickerDataModel) {
+fun RatingLayout(
+    driverDataModel: DriverDataModel,
+    orderDataModel: OrderDataModel,
+    merchantDataModel: MerchantDataModel,
+    initialStickerDataModel: StickerDataModel,
+    onComplete: () -> Unit
+) {
     var initialRating by remember { mutableIntStateOf(0) }
     var lastRating by remember { mutableIntStateOf(0) }
     var showBottomSheetDetailSticker by remember { mutableStateOf(false) }
@@ -82,7 +87,7 @@ fun RatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataMode
         Spacer(modifier = Modifier.size(24.dp))
 
         if (initialRating == 0) {
-            PreRatingLayout(driverDataModel = driverDataModel, orderDataModel = orderDataModel, prevRating = lastRating) {
+            PreRatingLayout(driverDataModel = driverDataModel, orderDataModel = orderDataModel, merchantDataModel, prevRating = lastRating) {
                 lastRating = it
                 initialRating = it
             }
@@ -91,7 +96,10 @@ fun RatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataMode
                 initialRating,
                 onSelectRating = { lastRating = it },
                 onGenerateSticker = { showBottomSheetDetailSticker = true },
-                onSubmit = {})
+                stickerDataModel = initialStickerDataModel,
+                onSubmit = {
+                    onComplete()
+                })
         }
 
         if (showBottomSheetDetailSticker) {
@@ -114,7 +122,13 @@ fun RatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataMode
 }
 
 @Composable
-fun PreRatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataModel, prevRating: Int = 0, onRatingFilled: (Int) -> Unit) {
+fun PreRatingLayout(
+    driverDataModel: DriverDataModel,
+    orderDataModel: OrderDataModel,
+    merchantDataModel: MerchantDataModel,
+    prevRating: Int = 0,
+    onRatingFilled: (Int) -> Unit
+) {
     var rating by remember { mutableStateOf(prevRating) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(16.dp)) {
@@ -132,7 +146,7 @@ fun PreRatingLayout(driverDataModel: DriverDataModel, orderDataModel: OrderDataM
         )
 
         Text(
-            text = "How was the delivery of your order\nfrom Nanditya bakso - cipete?",
+            text = "How was the delivery of your order\nfrom ${merchantDataModel.name}?",
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center,
             color = Color.LightGray,
@@ -170,6 +184,7 @@ fun RatingSection(
     initialRating: Int,
     onSelectRating: (Int) -> Unit,
     onGenerateSticker: (String) -> Unit,
+    stickerDataModel: StickerDataModel,
     onSubmit: () -> Unit,
 ) {
     val ratings = getRatings()
@@ -253,7 +268,7 @@ fun RatingSection(
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        CardDriverGenerateSticker {
+        CardDriverGenerateSticker(stickerDataModel) {
             onGenerateSticker(it)
         }
 
@@ -292,24 +307,5 @@ fun RatingBar(
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun RatingPreview() {
-    AngelHackGrabTheme {
-        RatingLayout(
-            orderDataModel = OrderDataModel(totalPrice = "42.000"),
-            driverDataModel = DriverDataModel(
-                name = "John Doe",
-                photoUrl = "https://gallery.poskota.co.id/storage/Foto/aloy-ojol.jpg",
-                rating = 4.9,
-                vehicle = "Verio 180",
-                vehicleNumber = "B 5123 UYT",
-                story = "Berani dan Pantang Menyerah merupakan hal yang menggambarkan muhadjirin sebagai sosok driver dengan baju terapi, dimana dia berani menerjang hujan bada mengantarkan penumpang. Hal ini sudah dilakukannya 20 kali"
-            ),
-            initialStickerDataModel = StickerDataModel(imageUrl = "https://gallery.poskota.co.id/storage/Foto/aloy-ojol.jpg")
-        )
     }
 }

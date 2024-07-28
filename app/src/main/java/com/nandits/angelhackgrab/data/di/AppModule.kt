@@ -1,6 +1,7 @@
 package com.nandits.angelhackgrab.data.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.compose.runtime.Stable
 import com.nandits.angelhackgrab.AngelHackGrabApp
 import dagger.Module
@@ -19,5 +20,13 @@ class AppModule {
     @Provides
     fun provideApplication(@ApplicationContext app: Context): AngelHackGrabApp {
         return app as AngelHackGrabApp
+    }
+
+    @Provides
+    @Singleton
+    fun provideSharedPreferences(
+        @ApplicationContext context: Context
+    ): SharedPreferences {
+        return context.getSharedPreferences("GREFF", Context.MODE_PRIVATE)
     }
 }

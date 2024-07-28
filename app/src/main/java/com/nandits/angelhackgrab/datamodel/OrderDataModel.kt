@@ -9,9 +9,7 @@ data class OrderDataModel(
     var totalPrice: String = "",
     var originalPrice: String = "",
     var itemsCount: Int = 0,
-    var tips: List<Tip> = emptyList(),
     var pointsEarned: String = "",
-    var quickRatings: List<QuickRating> = emptyList(),
     var merchantId: Int = 0,
 ) : Parcelable
 

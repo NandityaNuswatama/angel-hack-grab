@@ -8,6 +8,7 @@ import com.nandits.angelhackgrab.data.response.DriverResponse
 import com.nandits.angelhackgrab.data.response.GenerateStickerResponse
 import com.nandits.angelhackgrab.data.response.Merchant
 import com.nandits.angelhackgrab.data.response.Order
+import com.nandits.angelhackgrab.data.response.OrderResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -15,7 +16,7 @@ import retrofit2.http.Path
 
 interface OrderService {
     @GET("orders/{id}")
-    suspend fun getOrder(@Path("id") id: Int): Order
+    suspend fun getOrder(@Path("id") id: Int): OrderResponse
 
     @POST("orders")
     suspend fun createOrder(@Body orderRequest: OrderRequest): CreateOrderResponse

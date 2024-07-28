@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -20,8 +21,8 @@ fun MerchantScreen(navController: NavController, viewModel: OrderViewModel = hil
     val merchant by viewModel.merchant.collectAsState()
     val orderCreated by viewModel.orderCreated.collectAsState()
     var orderDataModel by remember { mutableStateOf(OrderDataModel()) }
-    var totalPrice by remember { mutableStateOf(0) }
-    var originalPrice by remember { mutableStateOf(0) }
+    var totalPrice by remember { mutableIntStateOf(0) }
+    var originalPrice by remember { mutableIntStateOf(0) }
     var isOnDisplay by remember { mutableStateOf(true) }
     var isBlank by remember { mutableStateOf(true) }
 
@@ -49,7 +50,7 @@ fun MerchantScreen(navController: NavController, viewModel: OrderViewModel = hil
     if (isOnDisplay) {
         orderCreated?.let {
             navController.popBackStack()
-            navController.navigate("delivery/${it.first}/${it.second}")
+            navController.navigate("delivery/${it.second}")
             isOnDisplay = false
         }
     }

@@ -9,10 +9,11 @@ import com.nandits.angelhackgrab.data.response.DriverResponse
 import com.nandits.angelhackgrab.data.response.GenerateStickerResponse
 import com.nandits.angelhackgrab.data.response.Merchant
 import com.nandits.angelhackgrab.data.response.Order
+import com.nandits.angelhackgrab.data.response.OrderResponse
 import javax.inject.Inject
 
 class OrderRepository @Inject constructor(private val orderService: OrderService) {
-    suspend fun getOrder(id: Int): Order {
+    suspend fun getOrder(id: Int): OrderResponse {
         return orderService.getOrder(id)
     }
 

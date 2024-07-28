@@ -27,3 +27,8 @@ fun getRatings(): List<RatingDataModel> {
 fun getQuickRatings(): List<String> {
     return listOf("Friendly", "Contactless Delivery", "Punctually", "Service", "Followed Instructions", "Attitude", "Hygenic", "Dressed in Grab")
 }
+
+const val ORDER = "ORDER"
+const val MERCHANT = "MERCHANT"
+const val DRIVER = "DRIVER"
+const val STICKER = "STICKER"
