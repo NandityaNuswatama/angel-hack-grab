@@ -1,6 +1,7 @@
 package com.nandits.angelhackgrab.screen.merchant
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -44,7 +45,9 @@ fun MerchantLayout(
     onBackClicked: () -> Unit,
     onOrderClicked: () -> Unit
 ) {
-    Box(modifier = Modifier.background(Color.LightGray)) {
+    Box(modifier = Modifier
+        .background(Color.LightGray)
+        .fillMaxSize()) {
         GrabImage(
             imageURL = merchantDataModel.bannerImageUrl, modifier = Modifier
                 .height(260.dp)
@@ -55,9 +58,9 @@ fun MerchantLayout(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(top = 16.dp, end = 16.dp, start = 16.dp)
         ) {
             IconButton(
-                modifier = Modifier.padding(start = 16.dp),
                 onClick = onBackClicked,
             ) {
                 Icon(imageVector = Icons.Default.ArrowBack, contentDescription = null)
@@ -68,19 +71,20 @@ fun MerchantLayout(
             Card(
                 shape = RoundedCornerShape(12.dp),
             ) {
-                Column(modifier = Modifier
-                    .background(Color.White)
-                    .padding(16.dp)
+                Column(
+                    modifier = Modifier
+                        .background(Color.White)
+                        .padding(16.dp)
                 ) {
                     Row(Modifier.padding(12.dp)) {
                         GrabImage(imageURL = merchantDataModel.merchantImageUrl, modifier = Modifier.size(100.dp))
 
                         Spacer(Modifier.width(14.dp))
 
-                        Column {
+                        Column(verticalArrangement = Arrangement.Center) {
                             Text(text = merchantDataModel.name, style = MaterialTheme.typography.titleMedium)
                             Text(text = merchantDataModel.address, style = MaterialTheme.typography.bodyMedium)
-                            Row {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 for (i in 1 until 5) {
                                     Icon(
                                         imageVector = Icons.Default.Star,
@@ -97,8 +101,8 @@ fun MerchantLayout(
                                 GrabImage(
                                     imageURL = R.drawable.il_grab_delivery_icon,
                                     modifier = Modifier
-                                        .height(14.dp)
-                                        .width(17.dp)
+                                        .height(20.dp)
+                                        .width(28.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(text = "Rp. ${merchantDataModel.deliveryPrice}")
@@ -112,7 +116,7 @@ fun MerchantLayout(
 
             Column(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(Color.White)
                     .padding(horizontal = 16.dp)
             ) {
@@ -122,21 +126,25 @@ fun MerchantLayout(
                         .padding(vertical = 8.dp)
                 )
 
-                Text(text = "For You", style = MaterialTheme.typography.titleMedium)
+                Text(text = "For You", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(start = 4.dp))
 
-                LazyColumn(modifier = Modifier.height(400.dp)) {
+                LazyColumn(modifier = Modifier
+                    .height(500.dp)
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 56.dp)
+                ) {
                     itemsIndexed(merchantDataModel.productDataModels) { index, _ ->
-                        Row {
+                        Row(horizontalArrangement = Arrangement.SpaceAround, modifier = Modifier.fillMaxWidth()) {
                             if (index % 2 == 0) {
                                 ProductItem(productDataModel = merchantDataModel.productDataModels[index])
-
-                                Spacer(modifier = Modifier.width(8.dp))
 
                                 if (index < merchantDataModel.productDataModels.size) {
                                     ProductItem(productDataModel = merchantDataModel.productDataModels[index + 1])
                                 }
                             }
                         }
+
+                        Spacer(modifier = Modifier.padding(bottom = 12.dp))
                     }
                 }
             }
@@ -144,7 +152,7 @@ fun MerchantLayout(
 
         Button(
             onClick = onOrderClicked, modifier = Modifier
-                .padding(vertical = 16.dp)
+                .height(48.dp)
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth(0.9f)
         ) {
@@ -159,25 +167,27 @@ fun ProductItem(productDataModel: ProductDataModel) {
     Card(
         shape = RoundedCornerShape(12.dp)
     ) {
-        Column(Modifier.padding(12.dp)) {
+        Column {
             Box(modifier = Modifier.size(160.dp)) {
                 GrabImage(
                     imageURL = productDataModel.productImageUrl, modifier = Modifier
-                        .size(160.dp)
+                        .size(150.dp)
                         .clip(RoundedCornerShape(16.dp))
                 )
 
-                GrabImage(imageURL = R.drawable.il_grab_fab_add, modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 16.dp, end = 16.dp))
+                GrabImage(
+                    imageURL = R.drawable.il_grab_fab_add, modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 16.dp, end = 16.dp)
+                )
             }
 
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(4.dp))
 
-            Column(Modifier.widthIn(150.dp)) {
+            Column(Modifier.width(150.dp)) {
                 Text(text = productDataModel.name, style = MaterialTheme.typography.bodyLarge)
                 Text(text = "Rp. ${productDataModel.price}", style = MaterialTheme.typography.titleSmall)
-                Text(text = "Rp. ${productDataModel.originalPrice}", style = MaterialTheme.typography.titleSmall, textDecoration = TextDecoration.LineThrough)
+                Text(text = "Rp. ${productDataModel.originalPrice}", style = MaterialTheme.typography.bodySmall, textDecoration = TextDecoration.LineThrough)
             }
         }
     }

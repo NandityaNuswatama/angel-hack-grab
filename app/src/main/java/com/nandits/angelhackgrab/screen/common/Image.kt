@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,6 +24,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -50,7 +52,7 @@ fun GrabImage(
             Image(
                 painter = painter,contentDescription = contentDescription,
                 contentScale = contentScale,
-                modifier = modifier
+                modifier = modifier.clip(RoundedCornerShape(8.dp))
             )
             if (painter.state is AsyncImagePainter.State.Loading) {
                 CircularProgressIndicator(Modifier.align(Alignment.Center))
